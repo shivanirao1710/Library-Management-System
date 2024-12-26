@@ -43,6 +43,7 @@ $user = $_SESSION['user'];  // The session now contains the entire user record
                     <th>Title</th>
                     <th>Author</th>
                     <th>Available Quantity</th>
+                    <th>Action</th>
                 </tr>
             </thead>
             <tbody>
@@ -54,6 +55,7 @@ $user = $_SESSION['user'];  // The session now contains the entire user record
                     echo "<td>" . htmlspecialchars($book['title']) . "</td>";
                     echo "<td>" . htmlspecialchars($book['author']) . "</td>";
                     echo "<td>" . htmlspecialchars($book['available_quantity']) . "</td>";
+                    echo "<td><a href='delete_book.php?book_id=" . $book['id'] . "'><button>Delete</button></a></td>";
                     echo "</tr>";
                 }
                 ?>

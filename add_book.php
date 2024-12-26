@@ -2,7 +2,16 @@
 session_start();
 include('config.php');
 
+// Check if the user is logged in and is an admin
+if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
+    // Redirect to the dashboard if the user is not an admin
+    header("Location: dashboard.php");
+    exit();
+}
+
+// Process the form when it is submitted (POST request)
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Sanitize and get data from the form
     $title = $_POST['title'];
     $author = $_POST['author'];
     $genre = $_POST['genre'];
@@ -16,9 +25,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit();
     }
 
+    // Set available quantity equal to total quantity initially
     $available_quantity = $total_quantity;
 
-    // Insert book into the database
+    // Insert the new book into the database
     $stmt = $conn->prepare("INSERT INTO books (title, author, genre, publication_year, total_quantity, available_quantity) VALUES (?, ?, ?, ?, ?, ?)");
     $stmt->bind_param("sssiii", $title, $author, $genre, $publication_year, $total_quantity, $available_quantity);
     $stmt->execute();
@@ -42,7 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <h1>Add New Book</h1>
     </header>
 
-    <!-- Display the error message if the validation failed -->
+    <!-- Display error message if validation failed -->
     <?php
     if (isset($_SESSION['error'])) {
         echo '<p style="color: red;">' . $_SESSION['error'] . '</p>';
@@ -50,6 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     ?>
 
+    <!-- Add book form -->
     <form action="add_book.php" method="POST">
         <label for="title">Book Title:</label>
         <input type="text" id="title" name="title" required>
@@ -68,6 +79,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         <button type="submit">Add Book</button>
     </form>
-    <a href="dashboard.php"><button>Back to Home</button></a>
+
+    <!-- Button to go back to dashboard -->
+    <a href="dashboard.php"><button>Back to Dashboard</button></a>
 </body>
 </html>

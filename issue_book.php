@@ -1,28 +1,38 @@
 <?php
-session_start();
-include('config.php');
+include('config.php');  // Include your DB connection
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $book_id = $_POST['book_id'];
     $member_id = $_POST['member_id'];
 
     // Check if the book is available
-    $stmt = $conn->prepare("SELECT * FROM books WHERE book_id = ? AND available_quantity > 0");
+    $stmt = $conn->prepare("SELECT * FROM books WHERE id = ? AND available_quantity > 0");
     $stmt->bind_param("i", $book_id);
     $stmt->execute();
     $result = $stmt->get_result();
 
     if ($result->num_rows > 0) {
         // Issue the book
-        $conn->query("INSERT INTO transactions (book_id, member_id, issue_date) VALUES ($book_id, $member_id, NOW())");
-        $conn->query("UPDATE books SET available_quantity = available_quantity - 1 WHERE book_id = $book_id");
+        $stmt_issue = $conn->prepare("INSERT INTO transactions (book_id, member_id, issue_date) VALUES (?, ?, NOW())");
+        $stmt_issue->bind_param("ii", $book_id, $member_id);
+        $stmt_issue->execute();
+
+        // Update the available quantity
+        $stmt_update = $conn->prepare("UPDATE books SET available_quantity = available_quantity - 1 WHERE id = ?");
+        $stmt_update->bind_param("i", $book_id);
+        $stmt_update->execute();
 
         echo "Book issued successfully!";
     } else {
         echo "Book is not available.";
     }
+
+    $stmt->close();
+    $stmt_issue->close();
+    $stmt_update->close();
 }
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
