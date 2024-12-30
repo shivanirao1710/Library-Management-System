@@ -17,11 +17,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt_issue->bind_param("ii", $book_id, $member_id);
         $stmt_issue->execute();
 
-        // Update the available quantity
-        $stmt_update = $conn->prepare("UPDATE books SET available_quantity = available_quantity - 1 WHERE id = ?");
-        $stmt_update->bind_param("i", $book_id);
-        $stmt_update->execute();
-
         echo "Book issued successfully!";
     } else {
         echo "Book is not available.";
@@ -29,7 +24,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $stmt->close();
     $stmt_issue->close();
-    $stmt_update->close();
 }
 ?>
 
